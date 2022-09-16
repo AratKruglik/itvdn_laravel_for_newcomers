@@ -4,75 +4,49 @@ namespace App\Http\Controllers;
 
 use App\Models\TodoItem;
 use Illuminate\Contracts\View\View;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 
 class TodoController extends Controller
 {
     public function index(): View
     {
-        $todos = TodoItem::with('user')->get();
+        $todos = auth()->user()->todos;
 
-        return view('index', compact('todos'));
+        return view('dashboard', compact('todos'));
     }
 
-    public function create()
+    public function archive(): View
     {
-        //
+        $todos = auth()->user()->todos()->onlyTrashed()->get();
+
+        return view('dashboard', compact('todos'));
     }
 
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
+    public function create(): View
+    {
+        return view('todos.form');
+    }
+
     public function store(Request $request)
     {
-        //
+        dd($request);
     }
 
-    /**
-     * Display the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function show($id)
+    public function edit(TodoItem $todo)
+    {
+        return view('todos.form', compact('todo'));
+    }
+
+    public function update(Request $request, TodoItem $todo)
     {
         //
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function edit($id)
+    public function done(TodoItem $todo): RedirectResponse
     {
-        //
-    }
+        $todo->delete();
 
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function update(Request $request, $id)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function destroy($id)
-    {
-        //
+        return redirect()->route('dashboard');
     }
 }
