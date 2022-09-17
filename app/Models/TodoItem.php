@@ -16,6 +16,7 @@ class TodoItem extends Model
         'body',
         'is_done',
         'deleted_at',
+        'user_id',
     ];
 
     public function user(): BelongsTo

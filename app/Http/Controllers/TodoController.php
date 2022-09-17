@@ -2,10 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\CreateUpdateTodoRequest;
 use App\Models\TodoItem;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
-use Illuminate\Http\Request;
 
 class TodoController extends Controller
 {
@@ -28,9 +28,15 @@ class TodoController extends Controller
         return view('todos.form');
     }
 
-    public function store(Request $request)
+    public function store(CreateUpdateTodoRequest $request): RedirectResponse
     {
-        dd($request);
+        TodoItem::create([
+            'title'   => $request->get('title'),
+            'body'    => $request->get('body'),
+            'user_id' => auth()->user()->getKey(),
+        ]);
+
+        return redirect()->route('dashboard');
     }
 
     public function edit(TodoItem $todo)
@@ -38,9 +44,14 @@ class TodoController extends Controller
         return view('todos.form', compact('todo'));
     }
 
-    public function update(Request $request, TodoItem $todo)
+    public function update(CreateUpdateTodoRequest $request, TodoItem $todo)
     {
-        //
+        $todo->update([
+            'title' => $request->get('title', $todo->title),
+            'body'  => $request->get('body', $todo->body),
+        ]);
+
+        return redirect()->route('dashboard');
     }
 
     public function done(TodoItem $todo): RedirectResponse
